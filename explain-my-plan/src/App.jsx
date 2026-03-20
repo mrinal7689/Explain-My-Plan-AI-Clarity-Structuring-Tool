@@ -34,45 +34,64 @@ Scoring rules (max 100):
 Be honest, practical, and constructive. Always return valid JSON only.`;
 
 const css = `
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+  /* Sans-serif UI: keep it fast + readable */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
+    --sans: system-ui, "Segoe UI", Roboto, Arial, sans-serif;
+
     --bg: #0a0a0f; --surface: #111118; --surface2: #18181f;
     --border: rgba(255,255,255,0.07); --accent: #c8f55a;
     --accent2: #7c5cfc; --accent3: #ff6b6b;
     --text: #eeeef2; --muted: #6b6b7e; --card-radius: 16px;
+    --card-radius: 16px;
   }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; line-height: 1.6; }
-  .app { max-width: 900px; margin: 0 auto; padding: 48px 24px 80px; }
-  .header { margin-bottom: 52px; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; line-height: 1.6; }
+  .app { width: 100%; max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+  .header { margin-bottom: 52px; width: 100%; text-align: center; }
   .header-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
-  .header h1 { font-family: 'Syne', sans-serif; font-size: clamp(36px, 6vw, 58px); font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; }
+  .header h1 { font-family: var(--sans); font-size: clamp(36px, 6vw, 58px); font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; }
   .header h1 span { color: var(--accent); }
-  .header-desc { color: var(--muted); font-size: 15px; margin-top: 16px; max-width: 480px; font-weight: 300; }
-  .input-section { margin-bottom: 36px; }
+  .header-desc { color: var(--muted); font-size: 15px; margin-top: 16px; max-width: 560px; font-weight: 300; }
+  .input-section { margin-bottom: 36px; width: 100%; }
   .input-label { font-size: 12px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; display: block; }
   .input-wrap { position: relative; }
-  textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--card-radius); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 300; line-height: 1.7; padding: 20px 24px; resize: none; outline: none; min-height: 130px; transition: border-color 0.2s; }
+  textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--card-radius); color: var(--text); font-family: var(--sans); font-size: 15px; font-weight: 400; line-height: 1.7; padding: 20px 24px; resize: none; outline: none; min-height: 130px; transition: border-color 0.2s; }
   textarea::placeholder { color: var(--muted); }
   textarea:focus { border-color: rgba(200,245,90,0.3); }
   .char-count { position: absolute; bottom: 14px; right: 18px; font-size: 11px; color: var(--muted); }
-  .analyze-btn { margin-top: 14px; background: var(--accent); color: #0a0a0f; border: none; border-radius: 10px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 0.03em; padding: 14px 32px; cursor: pointer; transition: opacity 0.2s, transform 0.15s; display: inline-flex; align-items: center; gap: 8px; }
+  .analyze-btn { margin-top: 14px; background: var(--accent); color: #000000; border: none; border-radius: 10px; font-family: var(--sans); font-weight: 800; font-size: 14px; letter-spacing: 0.03em; padding: 14px 32px; cursor: pointer; transition: opacity 0.2s, transform 0.15s; display: inline-flex; align-items: center; gap: 8px; }
   .analyze-btn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
   .analyze-btn:disabled { opacity: 0.45; cursor: not-allowed; }
   .spinner { width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.3); border-top-color: #0a0a0f; border-radius: 50%; animation: spin 0.6s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .error-box { background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.2); border-radius: 10px; padding: 14px 18px; color: var(--accent3); font-size: 14px; margin-top: 12px; }
-  .results { display: flex; flex-direction: column; gap: 16px; animation: fadeUp 0.5s ease; }
+  .auth-wrap { display: flex; justify-content: center; }
+  .auth-panel { width: 380px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--card-radius); padding: 20px 18px 16px; }
+  .auth-title { font-family: var(--sans); font-size: 16px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
+  .auth-sub { color: var(--muted); font-size: 13px; margin-bottom: 14px; font-weight: 300; line-height: 1.5; }
+  .auth-toggle { display: flex; gap: 8px; padding: 4px; border-radius: 999px; background: var(--surface2); border: 1px solid var(--border); margin-bottom: 14px; }
+  .auth-pill { flex: 1; border: none; border-radius: 999px; background: transparent; color: var(--muted); font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 10px 0; cursor: pointer; }
+  .auth-pill.active { background: var(--bg); color: var(--accent); }
+  .auth-field { margin-bottom: 10px; }
+  .auth-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; display: block; font-weight: 600; }
+  .auth-input { width: 100%; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); padding: 10px 12px; font-size: 14px; outline: none; }
+  .auth-input:focus { border-color: rgba(200,245,90,0.35); }
+  .auth-meta { margin-top: 10px; color: var(--muted); font-size: 12px; font-weight: 300; line-height: 1.5; }
+  .auth-actions { display: flex; gap: 10px; margin-top: 12px; }
+  .auth-secondary { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 10px; font-family: var(--sans); font-size: 13px; padding: 12px 14px; cursor: pointer; }
+  .auth-primary { flex: 2; }
+  .auth-success { margin-top: 10px; background: rgba(200,245,90,0.08); border: 1px solid rgba(200,245,90,0.2); color: var(--accent); border-radius: 10px; padding: 12px 14px; font-size: 13px; font-weight: 600; }
+  .results { display: flex; flex-direction: column; gap: 16px; animation: fadeUp 0.5s ease; width: 100%; text-align: left; }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
   .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-  .results-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .results-title { font-family: var(--sans); font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
   .score-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 100px; padding: 8px 20px; display: flex; align-items: center; gap: 12px; }
-  .score-num { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; line-height: 1; }
+  .score-num { font-family: var(--sans); font-size: 26px; font-weight: 800; line-height: 1; }
   .score-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
   .score-bar-track { height: 3px; background: var(--surface); border-radius: 2px; overflow: hidden; margin-top: 5px; width: 70px; }
   .score-bar-fill { height: 100%; border-radius: 2px; transition: width 1.2s ease; }
   .simplified-card { background: linear-gradient(135deg, rgba(200,245,90,0.06) 0%, rgba(124,92,252,0.06) 100%); border: 1px solid rgba(200,245,90,0.15); border-radius: var(--card-radius); padding: 24px 28px; }
-  .simplified-text { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 600; color: var(--text); line-height: 1.5; }
+  .simplified-text { font-family: var(--sans); font-size: 18px; font-weight: 700; color: var(--text); line-height: 1.5; }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--card-radius); padding: 22px 26px; }
   .card-title { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
   .card-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
@@ -83,7 +102,8 @@ const css = `
   @media (max-width: 600px) { .row-2 { grid-template-columns: 1fr; } }
   .list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
   .list li { display: flex; gap: 10px; font-size: 14px; font-weight: 300; color: var(--text); line-height: 1.5; }
-  .list-num { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; color: var(--accent); min-width: 20px; padding-top: 2px; }
+  .list li { text-align: left; justify-content: flex-start; }
+  .list-num { font-family: var(--sans); font-size: 11px; font-weight: 800; color: var(--accent); min-width: 20px; padding-top: 2px; }
   .list-num.purple { color: var(--accent2); }
   .timeline-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; font-size: 14px; font-weight: 400; color: var(--text); }
   .divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
@@ -97,10 +117,18 @@ const css = `
   .breakdown-label { color: var(--muted); font-size: 12px; font-weight: 300; min-width: 120px; }
   .breakdown-track { flex: 1; height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
   .breakdown-fill { height: 100%; background: var(--accent2); border-radius: 2px; transition: width 1.2s ease; }
-  .breakdown-val { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; color: var(--text); min-width: 36px; text-align: right; }
+  .breakdown-val { font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--text); min-width: 36px; text-align: right; }
   .explanation { margin-top: 14px; font-size: 13px; color: var(--muted); font-weight: 300; border-top: 1px solid var(--border); padding-top: 12px; line-height: 1.65; }
-  .reset-btn { background: none; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 9px 20px; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
+  .reset-btn { background: none; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-family: var(--sans); font-size: 13px; padding: 9px 20px; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
   .reset-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* --- Chat layout --- */
+  .chat-history { width: 100%; margin-top: 18px; display: flex; flex-direction: column; gap: 18px; overflow: auto; padding-right: 6px; flex: 1; max-height: calc(100vh - 320px); }
+  .chat-item { width: 100%; max-width: 920px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--card-radius); padding: 18px; text-align: center; }
+  .chat-role { font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; text-align: center; }
+  .chat-text { white-space: pre-wrap; word-break: break-word; text-align: center; font-size: 14px; line-height: 1.65; color: var(--text); }
+  .chat-assistant { margin-top: 14px; text-align: left; }
+  .chat-empty { width: 100%; max-width: 920px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--card-radius); padding: 18px; color: var(--muted); text-align: center; }
 `;
 
 function scoreColor(s) {
@@ -114,19 +142,90 @@ const LABELS = { goalDefined: "Goal Defined", stepsDefined: "Steps Defined", tim
 
 export default function App() {
   const [input, setInput] = useState("");
+  const [mode, setMode] = useState("login"); // 'login' | 'signup'
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState("");
+  const [authSuccess, setAuthSuccess] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [user, setUser] = useState(() => {
+    const stored = localStorage.getItem("emp_user");
+    try {
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [token, setToken] = useState(() => localStorage.getItem("emp_token") || "");
+
+  const authed = Boolean(token);
+
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
-  const ref = useRef(null);
+
+  const handleAuth = async () => {
+    if (!email || !password) {
+      setAuthError("Email and password are required.");
+      return;
+    }
+    setAuthError("");
+    setAuthSuccess("");
+    setAuthLoading(true);
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3001";
+      const endpoint = mode === "signup" ? "/api/auth/signup" : "/api/auth/login";
+      const res = await fetch(`${apiUrl}${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Authentication failed");
+
+      setUser(data.user);
+      setToken(data.token);
+      localStorage.setItem("emp_user", JSON.stringify(data.user));
+      localStorage.setItem("emp_token", data.token);
+      setAuthSuccess(mode === "signup" ? "Account created. You're in." : "Welcome back.");
+
+      // Switch view to the main app immediately after auth succeeds.
+      setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50);
+    } catch (e) {
+      setAuthError(e.message || "Something went wrong. Please try again.");
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setToken("");
+    setResult(null);
+    setInput("");
+    setError("");
+    localStorage.removeItem("emp_user");
+    localStorage.removeItem("emp_token");
+    setAuthSuccess("");
+    setAuthError("");
+  };
 
   const analyze = async () => {
     if (!input.trim() || loading) return;
+    if (!authed) {
+      setError("Please login or create an account before analyzing.");
+      return;
+    }
     setLoading(true); setError(""); setResult(null);
     try {
       const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3001";
       const res = await fetch(`${apiUrl}/api/analyze`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ input }),
       });
       const data = await res.json();
@@ -144,10 +243,6 @@ export default function App() {
     }
   };
 
-  useEffect(() => {
-    if (result && ref.current) setTimeout(() => ref.current.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
-  }, [result]);
-
   const color = result ? scoreColor(result.clarityScore) : "#c8f55a";
 
   return (
@@ -157,110 +252,241 @@ export default function App() {
         <header className="header">
           <div className="header-eyebrow">AI Clarity Tool</div>
           <h1>Explain My <span>Plan.</span></h1>
-          <p className="header-desc">Turn vague ideas into structured, actionable plans. Paste your raw thoughts below.</p>
+          <p className="header-desc">Turn vague ideas into structured, actionable plans. Sign in to save your iterations.</p>
         </header>
 
-        <div className="input-section">
-          <label className="input-label">Your Idea or Plan</label>
-          <div className="input-wrap">
-            <textarea
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              placeholder={`e.g. "I want to start a YouTube channel and earn money quickly"`}
-              maxLength={1200}
-              onKeyDown={e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) analyze(); }}
-            />
-            <span className="char-count">{input.length}/1200</span>
-          </div>
-          <button className="analyze-btn" onClick={analyze} disabled={loading || !input.trim()}>
-            {loading ? <><span className="spinner" />Analyzing…</> : "Analyze Plan →"}
-          </button>
-          {error && <div className="error-box">{error}</div>}
-        </div>
+        {!authed ? (
+          <div className="auth-wrap">
+            <div className="auth-panel">
+              <div className="auth-title">{mode === "signup" ? "Create your account" : "Login"}</div>
+              <div className="auth-sub">
+                {mode === "signup"
+                  ? "Save your inputs and compare clarity improvements."
+                  : "Login to store your plans and iterate."}
+              </div>
 
-        {result && (
-          <div className="results" ref={ref}>
-            <div className="results-header">
-              <span className="results-title">Analysis</span>
-              <div className="score-badge">
-                <div>
-                  <div className="score-num" style={{ color }}>{result.clarityScore}</div>
-                  <div className="score-label">Clarity Score</div>
-                  <div className="score-bar-track">
-                    <div className="score-bar-fill" style={{ width: `${result.clarityScore}%`, background: color }} />
+              <div className="auth-toggle">
+                <button
+                  type="button"
+                  className={`auth-pill ${mode === "login" ? "active" : ""}`}
+                  onClick={() => { setMode("login"); setAuthError(""); setAuthSuccess(""); }}
+                  disabled={authLoading}
+                >
+                  Login
+                </button>
+                <button
+                  type="button"
+                  className={`auth-pill ${mode === "signup" ? "active" : ""}`}
+                  onClick={() => { setMode("signup"); setAuthError(""); setAuthSuccess(""); }}
+                  disabled={authLoading}
+                >
+                  Sign Up
+                </button>
+              </div>
+
+              {mode === "signup" && (
+                <div className="auth-field">
+                  <span className="auth-label">Name (optional)</span>
+                  <input
+                    className="auth-input"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="How should we call you?"
+                    disabled={authLoading}
+                  />
+                </div>
+              )}
+
+              <div className="auth-field">
+                <span className="auth-label">Email</span>
+                <input
+                  className="auth-input"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  disabled={authLoading}
+                />
+              </div>
+
+              <div className="auth-field">
+                <span className="auth-label">Password</span>
+                <input
+                  className="auth-input"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="At least 6 characters"
+                  disabled={authLoading}
+                />
+              </div>
+
+              <div className="auth-actions">
+                {mode === "login" ? (
+                  <button type="button" className="auth-secondary" onClick={() => { setMode("signup"); setAuthError(""); setAuthSuccess(""); }} disabled={authLoading}>
+                    Create account
+                  </button>
+                ) : (
+                  <button type="button" className="auth-secondary" onClick={() => { setMode("login"); setAuthError(""); setAuthSuccess(""); }} disabled={authLoading}>
+                    Have an account?
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  className="analyze-btn auth-primary"
+                  onClick={handleAuth}
+                  disabled={authLoading}
+                  style={{ marginTop: 0 }}
+                >
+                  {authLoading ? <><span className="spinner" />Working…</> : mode === "signup" ? "Sign Up" : "Login"}
+                </button>
+              </div>
+
+              {authError && <div className="error-box" style={{ marginTop: 12 }}>{authError}</div>}
+              {authSuccess && <div className="auth-success">{authSuccess}</div>}
+
+              <div className="auth-meta">
+                By continuing, your plans are stored in MongoDB for this account.
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 14 }}>
+              <div style={{ color: "var(--muted)", fontSize: 13, fontWeight: 300 }}>
+                Signed in as <span style={{ color: "var(--text)", fontWeight: 600 }}>{user?.name || user?.email}</span>
+              </div>
+              <button
+                type="button"
+                className="reset-btn"
+                onClick={handleLogout}
+              >
+                Log out
+              </button>
+            </div>
+
+            <div className="input-section">
+              <label className="input-label">Your Idea or Plan</label>
+              <div className="input-wrap">
+                <textarea
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  placeholder={`e.g. "I want to start a YouTube channel and earn money quickly"`}
+                  maxLength={1200}
+                  onKeyDown={e => {
+                    // Enter submits. Shift+Enter keeps newline.
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      analyze();
+                    }
+                  }}
+                />
+                <span className="char-count">{input.length}/1200</span>
+              </div>
+              <button className="analyze-btn" onClick={analyze} disabled={loading || !input.trim()}>
+                {loading ? <><span className="spinner" />Analyzing…</> : "Analyze Plan →"}
+              </button>
+              {error && <div className="error-box">{error}</div>}
+            </div>
+
+            {result && (
+              <div className="results" style={{ marginTop: 18 }}>
+                <div className="results-header">
+                  <span className="results-title">Analysis</span>
+                  <div className="score-badge">
+                    <div>
+                      <div className="score-num" style={{ color }}>{result.clarityScore}</div>
+                      <div className="score-label">Clarity Score</div>
+                      <div className="score-bar-track">
+                        <div className="score-bar-fill" style={{ width: `${result.clarityScore}%`, background: color }} />
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="simplified-card">
-              <div className="card-title"><span className="card-dot" />Simplified Version</div>
-              <div className="simplified-text">{result.simplifiedVersion}</div>
-            </div>
+                <div className="simplified-card">
+                  <div className="card-title"><span className="card-dot" />Simplified Version</div>
+                  <div className="simplified-text">{result.simplifiedVersion}</div>
+                </div>
 
-            <div className="row-2">
-              <div className="card">
-                <div className="card-title"><span className="card-dot purple" />Goal</div>
-                <div className="goal-text">{result.goal}</div>
-                <hr className="divider" />
-                <div className="card-title" style={{ marginBottom: 6 }}><span className="card-dot" />Method</div>
-                <div className="goal-text" style={{ fontSize: 14, fontWeight: 300 }}>{result.method}</div>
-              </div>
-              <div className="card">
-                <div className="card-title"><span className="card-dot" />Timeline</div>
-                <div className="timeline-chip">🕐 {result.timeline}</div>
-                <hr className="divider" />
-                <div className="card-title" style={{ marginBottom: 6 }}><span className="card-dot purple" />Identified Steps</div>
-                {result.steps?.length ? (
+                <div className="row-2">
+                  <div className="card">
+                    <div className="card-title"><span className="card-dot purple" />Goal</div>
+                    <div className="goal-text">{result.goal}</div>
+                    <hr className="divider" />
+                    <div className="card-title" style={{ marginBottom: 6 }}><span className="card-dot" />Method</div>
+                    <div className="goal-text" style={{ fontSize: 14, fontWeight: 300 }}>{result.method}</div>
+                  </div>
+                  <div className="card">
+                    <div className="card-title"><span className="card-dot" />Timeline</div>
+                    <div className="timeline-chip">🕐 {result.timeline}</div>
+                    <hr className="divider" />
+                    <div className="card-title" style={{ marginBottom: 6 }}><span className="card-dot purple" />Identified Steps</div>
+                    {result.steps?.length ? (
+                      <ul className="list">
+                        {result.steps.map((s, i) => (
+                          <li key={i}><span className="list-num">{i + 1}.</span>{s}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <div style={{ color: "var(--muted)", fontSize: 13 }}>No clear steps identified.</div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="card">
+                  <div className="card-title"><span className="card-dot purple" />Actionable Next Steps</div>
                   <ul className="list">
-                    {result.steps.map((s, i) => <li key={i}><span className="list-num">{i + 1}.</span>{s}</li>)}
+                    {result.actionableSteps?.map((s, i) => (
+                      <li key={i}><span className="list-num purple">{i + 1}.</span>{s}</li>
+                    ))}
                   </ul>
-                ) : <div style={{ color: "var(--muted)", fontSize: 13 }}>No clear steps identified.</div>}
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="card-title"><span className="card-dot purple" />Actionable Next Steps</div>
-              <ul className="list">
-                {result.actionableSteps?.map((s, i) => (
-                  <li key={i}><span className="list-num purple">{i + 1}.</span>{s}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="row-2">
-              <div className="card">
-                <div className="card-title"><span className="card-dot red" />Missing Elements</div>
-                <div className="missing-grid">
-                  {Object.entries(result.missingElements || {}).map(([k, v]) => (
-                    <div className={`missing-item ${!v ? "ok" : ""}`} key={k}>
-                      <div className="missing-key">{k.replace(/([A-Z])/g, " $1").trim()}</div>
-                      <div className="missing-val">{v || "✓ Looks good"}</div>
-                    </div>
-                  ))}
                 </div>
-              </div>
-              <div className="card">
-                <div className="card-title"><span className="card-dot" />Score Breakdown</div>
-                <div className="score-breakdown">
-                  {Object.entries(result.clarityBreakdown || {}).map(([k, v]) => (
-                    <div className="breakdown-row" key={k}>
-                      <span className="breakdown-label">{LABELS[k] || k}</span>
-                      <div className="breakdown-track">
-                        <div className="breakdown-fill" style={{ width: `${(v / (MAX[k] || 25)) * 100}%` }} />
-                      </div>
-                      <span className="breakdown-val">{v}/{MAX[k] || 25}</span>
-                    </div>
-                  ))}
-                </div>
-                {result.clarityExplanation && <div className="explanation">{result.clarityExplanation}</div>}
-              </div>
-            </div>
 
-            <button className="reset-btn" onClick={() => { setResult(null); setInput(""); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-              ↑ Analyze Another Plan
-            </button>
-          </div>
+                <div className="row-2">
+                  <div className="card">
+                    <div className="card-title"><span className="card-dot red" />Missing Elements</div>
+                    <div className="missing-grid">
+                      {Object.entries(result.missingElements || {}).map(([k, v]) => (
+                        <div className={`missing-item ${!v ? "ok" : ""}`} key={k}>
+                          <div className="missing-key">{k.replace(/([A-Z])/g, " $1").trim()}</div>
+                          <div className="missing-val">{v || "✓ Looks good"}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="card">
+                    <div className="card-title"><span className="card-dot" />Score Breakdown</div>
+                    <div className="score-breakdown">
+                      {Object.entries(result.clarityBreakdown || {}).map(([k, v]) => (
+                        <div className="breakdown-row" key={k}>
+                          <span className="breakdown-label">{LABELS[k] || k}</span>
+                          <div className="breakdown-track">
+                            <div className="breakdown-fill" style={{ width: `${(v / (MAX[k] || 25)) * 100}%` }} />
+                          </div>
+                          <span className="breakdown-val">{v}/{MAX[k] || 25}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {result.clarityExplanation && <div className="explanation">{result.clarityExplanation}</div>}
+                  </div>
+                </div>
+
+                <button
+                  className="reset-btn"
+                  onClick={() => {
+                    setResult(null);
+                    setInput("");
+                    setError("");
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                >
+                  ↑ Analyze Another Plan
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </>
