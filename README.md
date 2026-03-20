@@ -152,9 +152,11 @@ High-impact next improvements:
 
 Current screenshot asset:
 
-![App Preview](src/assets/hero.png)
+![App Preview](src/assets/Screenshot2026-03-19210934.png)
+![App Preview](src/assets/Screenshot2026-03-19210950.png)
+![App Preview](src/assets/Screenshot2026-03-19211015.png)
 
-If you have more screenshots, add them under `src/assets/` or `docs/screenshots/` and reference them here.
+
 
 ## Tech Stack
 
