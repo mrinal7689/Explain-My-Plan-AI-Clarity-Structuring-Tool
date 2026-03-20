@@ -19,7 +19,7 @@ Key outcomes for each input:
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 
 - npm
 - MongoDB Atlas connection string
 - Groq API key
