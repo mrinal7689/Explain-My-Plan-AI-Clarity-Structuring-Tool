@@ -11,38 +11,23 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// --- Mongo connection ---
-const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
 
+// --- Mongo connection ---
+const mongoUri = process.env.MONGO_URI;
+let mongoReady = false;
 if (!mongoUri) {
-  console.error("❌ MONGO_URI not set in .env — auth will not work.");
+  console.warn("MONGO_URI not set – auth & history will be unavailable.");
 } else {
-  console.log("Connecting to MongoDB...");
   mongoose
-    .connect(mongoUri, {
-      dbName: process.env.MONGO_DB_NAME || "explain_my_plan",
-      serverSelectionTimeoutMS: 10000, // wait up to 10s before throwing
-      socketTimeoutMS: 45000,
-    })
+    .connect(mongoUri, { dbName: process.env.MONGO_DB_NAME || "explain_my_plan" })
     .then(() => {
+      mongoReady = true;
       console.log("✓ Connected to MongoDB");
     })
     .catch((err) => {
-      console.error("❌ MongoDB connection failed:");
-      console.error("   Message:", err.message);
-      console.error("   Code:", err.code);
-      console.error("   Full error:", err);
+      mongoReady = false;
+      console.error("MongoDB connection error:", err.message);
     });
-}
-
-// Listen for connection events (catches disconnects after startup too)
-mongoose.connection.on("connected", () => console.log("MongoDB: connected"));
-mongoose.connection.on("disconnected", () => console.warn("MongoDB: disconnected"));
-mongoose.connection.on("error", (err) => console.error("MongoDB runtime error:", err.message));
-
-// Helper — use this instead of a static `mongoReady` flag
-function isMongoReady() {
-  return mongoose.connection.readyState === 1; // 1 = connected
 }
 
 // --- Mongo models ---
@@ -147,7 +132,7 @@ async function callGroqAPI(userInput) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
+      "Authorization": `Bearer ${apiKey}`,
     },
     body: JSON.stringify(requestBody),
   });
@@ -168,15 +153,10 @@ async function callGroqAPI(userInput) {
 
 // --- Auth routes ---
 app.post("/api/auth/signup", async (req, res) => {
-  if (!mongoUri) {
-    return res.status(500).json({ error: "MongoDB not configured on server. Check MONGO_URI in .env" });
-  }
-  if (!isMongoReady()) {
-    console.error("Signup attempt but MongoDB readyState:", mongoose.connection.readyState);
-    return res.status(503).json({ error: "Database unavailable. Please try again in a moment." });
-  }
-
   try {
+    if (!mongoUri) return res.status(500).json({ error: "MongoDB not configured on server" });
+    if (!mongoReady) return res.status(503).json({ error: "MongoDB not reachable. Check Atlas IP whitelist/VPN." });
+
     const { name, email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: "Email and password are required" });
 
@@ -193,20 +173,15 @@ app.post("/api/auth/signup", async (req, res) => {
     });
   } catch (error) {
     console.error("Signup error:", error.message);
-    return res.status(500).json({ error: "Failed to create account: " + error.message });
+    return res.status(500).json({ error: "Failed to create account" });
   }
 });
 
 app.post("/api/auth/login", async (req, res) => {
-  if (!mongoUri) {
-    return res.status(500).json({ error: "MongoDB not configured on server. Check MONGO_URI in .env" });
-  }
-  if (!isMongoReady()) {
-    console.error("Login attempt but MongoDB readyState:", mongoose.connection.readyState);
-    return res.status(503).json({ error: "Database unavailable. Please try again in a moment." });
-  }
-
   try {
+    if (!mongoUri) return res.status(500).json({ error: "MongoDB not configured on server" });
+    if (!mongoReady) return res.status(503).json({ error: "MongoDB not reachable. Check Atlas IP whitelist/VPN." });
+
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: "Email and password are required" });
 
@@ -223,11 +198,11 @@ app.post("/api/auth/login", async (req, res) => {
     });
   } catch (error) {
     console.error("Login error:", error.message);
-    return res.status(500).json({ error: "Failed to login: " + error.message });
+    return res.status(500).json({ error: "Failed to login" });
   }
 });
 
-// --- Core analysis route ---
+// --- Core analysis route (saves into MongoDB chat history) ---
 app.post("/api/analyze", authMiddleware, async (req, res) => {
   try {
     const { input } = req.body;
@@ -237,7 +212,7 @@ app.post("/api/analyze", authMiddleware, async (req, res) => {
 
     const result = await callGroqAPI(input);
 
-    if (mongoUri && req.user?.id && isMongoReady()) {
+    if (mongoUri && req.user?.id && mongoReady) {
       try {
         await Plan.create({
           userId: req.user.id,
@@ -252,17 +227,17 @@ app.post("/api/analyze", authMiddleware, async (req, res) => {
 
     return res.json(result);
   } catch (error) {
-    console.error("Analysis error:", error.message);
+    console.error("Error:", error.message);
     return res.status(500).json({ error: error.message || "Something went wrong" });
   }
 });
 
 // --- Recent chat history ---
 app.get("/api/plans/recent", authMiddleware, async (req, res) => {
-  if (!mongoUri) return res.json({ plans: [] });
-  if (!isMongoReady()) return res.status(503).json({ error: "Database unavailable." });
-
   try {
+    if (!mongoUri) return res.json({ plans: [] });
+    if (!mongoReady) return res.status(503).json({ error: "MongoDB not reachable. Check Atlas IP whitelist/VPN." });
+
     const plans = await Plan.find({ userId: req.user.id })
       .sort({ createdAt: -1 })
       .limit(10)
@@ -283,17 +258,8 @@ app.get("/api/plans/recent", authMiddleware, async (req, res) => {
   }
 });
 
-// --- Health check (useful for debugging) ---
-app.get("/api/health", (req, res) => {
-  res.json({
-    server: "ok",
-    mongo: isMongoReady() ? "connected" : "disconnected",
-    mongoReadyState: mongoose.connection.readyState,
-    // readyState: 0=disconnected, 1=connected, 2=connecting, 3=disconnecting
-  });
-});
-
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`✓ Backend server running on http://localhost:${PORT}`);
 });
+
