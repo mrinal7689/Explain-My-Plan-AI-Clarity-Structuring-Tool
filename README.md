@@ -176,4 +176,9 @@ Current screenshot asset:
   - `MONGO_DB_NAME` (optional but recommended)
   - `JWT_SECRET`
 
-If login shows `MongoDB not configured on server`, your backend host is missing `MONGO_URI`.
+#Challenges faced:
+I had to stabilize three moving parts at once: deployment configuration, model output reliability, and data persistence. On deployment, missing environment variables caused auth/history failures even when the UI looked correct. I fixed this by validating every required variable (MONGO_URI, JWT_SECRET, GROQ_API_KEY) and checking service-to-service URLs explicitly. For AI output, the main issue was inconsistent formatting from the model. Sometimes responses included extra text instead of strict JSON, which broke parsing and storage. I addressed this with stricter prompt constraints, schema-first instructions, and defensive parsing logic. Another challenge was keeping the scoring meaningful instead of random; I tied scoring to transparent rubric categories so users could improve plans iteratively.
+
+AI prompting approach: I used layered prompting. First, role framing set behavior (“structured thinking assistant”). Second, a strict JSON schema defined exact fields and prevented markdown chatter. Third, a scoring rubric embedded criteria (goal, steps, timeline, completeness) to align explanations with numbers. Finally, I tuned tone constraints to keep feedback practical and constructive. This combination improved consistency, reduced hallucinated structure, and made outputs directly usable by the frontend and database.
+
+
