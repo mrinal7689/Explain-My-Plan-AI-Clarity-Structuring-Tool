@@ -152,9 +152,9 @@ High-impact next improvements:
 
 Current screenshot asset:
 
-![App Preview](src/assets/Screenshot2026-03-19210934.png)
-![App Preview](src/assets/Screenshot2026-03-19210950.png)
-![App Preview](src/assets/Screenshot2026-03-19211015.png)
+![App Preview](src/assets/Screenshot%202026-03-19%20210934.png)
+![App Preview](src/assets/Screenshot%202026-03-19%20210950.png)
+![App Preview](src/assets/Screenshot%202026-03-19%20211015.png)
 
 
 
