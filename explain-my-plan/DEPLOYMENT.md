@@ -42,8 +42,16 @@ The application consists of two parts:
    - Add:
      ```
      GROQ_API_KEY=your_groq_api_key_here
+       MONGO_URI=your_mongodb_connection_string
+       MONGO_DB_NAME=explain_my_plan
+       JWT_SECRET=a_long_random_secret_string
      PORT=3001
      ```
+
+    Required for login/signup:
+    - `MONGO_URI` must be set, otherwise auth endpoints return `MongoDB not configured on server`.
+    - `MONGO_DB_NAME` is optional (defaults to `explain_my_plan`).
+    - `JWT_SECRET` is strongly recommended in production.
 
 6. **Deploy**
    - Click "Create Web Service"
@@ -132,6 +140,15 @@ After deploying both:
 - Go to Render dashboard
 - Check Environment Variables
 - Verify the key is valid at [console.groq.com](https://console.groq.com)
+
+### Login shows "MongoDB not configured on server"
+
+**Cause**: `MONGO_URI` is missing in your backend environment (Render or Vercel server environment)
+
+**Solution**:
+- Add `MONGO_URI` in backend environment variables
+- Ensure your MongoDB Atlas Network Access allows Render egress (or `0.0.0.0/0` for testing)
+- Redeploy backend after saving variables
 
 **Solution**:
 ```bash
