@@ -150,11 +150,13 @@ High-impact next improvements:
 
 ## Screenshots
 
-Current screenshot asset:
+Current screenshot assets:
 
-![App Preview](src/assets/hero.png)
+![App Preview](<src/assets/Screenshot 2026-03-19 210934.png>)
+![App Preview](<src/assets/Screenshot 2026-03-19 210950.png>)
+![App Preview](<src/assets/Screenshot 2026-03-19 211015.png>)
 
-If you have more screenshots, add them under `src/assets/` or `docs/screenshots/` and reference them here.
+If you add more screenshots with spaces in names, use URL-encoded paths in Markdown (replace each space with `%20`).
 
 ## Tech Stack
 
